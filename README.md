@@ -8,14 +8,9 @@ in the TeleCal directory.
 You'll need the [Google Calendar API](https://developers.google.com/google-apps/calendar/quickstart/python) (you may skip Step 1) and [BeautifulSoup](https://pypi.python.org/pypi/beautifulsoup4) to run this.
 
 ##Usage
-* Go to Terminal and type the following:
-```
-    git remote add telecal https://github.com/dhrushilbadani/TeleCal.git
-    git pull telecal master
-    cd TeleCal
-```
+* Download the .zip file from the pane on the right >> , and extract its contents.
 * Go to your [TeleBears class list](https://telebears.berkeley.edu/telebears/enrollment), and save the page as an HTML file in the TeleCal/ directory.
-* Run TeleCal.py from Terminal:
+* Run TeleCal.py (in the extracted folder):
     ```
     python TeleCal.py
     ```
