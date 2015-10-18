@@ -1,20 +1,22 @@
 # TeleCal
 Integrates Cal students' class schedules (from TeleBears) with their Google Calendars. In Python.
 
-This is a Python tool to integrate Cal students' class schedules (from [TeleBears](https://telebears.berkeley.edu/telebears/home) with their [Google Calendars](https://www.google.com/calendar/) using the [Google Calendar API for Python](https://developers.google.com/google-apps/calendar/quickstart/python). Since there's no available
-API for TeleBears as of now and scraping the website with just the [class list URL](https://telebears.berkeley.edu/telebears/enrollment?action=class_list) is impossible (let me know if you do succeed though; I tried the Selenium, requests, BeautifulSoup and mechanize libraries to no avail!), students will instead simply have to save the webpage of their [class list](https://telebears.berkeley.edu/telebears/enrollment?action=class_list)
-in the TeleCal directory. 
+This is a Python tool to integrate Cal students' class schedules (from [TeleBears](https://telebears.berkeley.edu/telebears/home)) with their [Google Calendars](https://www.google.com/calendar/). No need to login to TeleBears to check your schedule ever again, it's all on your Google Calendar! 
 
-You'll need the [Google Calendar API](https://developers.google.com/google-apps/calendar/quickstart/python) (you may skip Step 1) and [BeautifulSoup](https://pypi.python.org/pypi/beautifulsoup4) to run this.
+Uses the [Google Calendar API](https://developers.google.com/google-apps/calendar/quickstart/python) (you may skip Step 1), [Selenium](http://selenium-python.readthedocs.org/), [PhantomJS](http://phantomjs.org/) and [BeautifulSoup](https://pypi.python.org/pypi/beautifulsoup4). Since there's no TeleBears API, I had to work my way around CalNet authentication using Selenium and PhantomJS ;)
 
 ##Usage
-* Download the .zip file from the pane on the right >> , and extract its contents.
-* Go to your [TeleBears class list](https://telebears.berkeley.edu/telebears/enrollment), and save the page as an HTML file in the TeleCal/ directory.
-* Run TeleCal.py (in the extracted folder):
+* Download the .zip file from the pane on the right >> , and extract its contents (Git folks can feel free to fork + pull instead).
+* Get the necessary libraries** and run TeleCal.py (in the extracted folder):
     ```
     python TeleCal.py
     ```
-* You'll be provided with two choices:
-  * Use existing credentials that TeleCal stores securely on your machine (if they exist), or
-  * Provide new credentials by logging in with OAuth2 authentication to his/her Google account in a browser window that'll automatically open up.
-* You'll then be asked to provide the end date for the semester, and TeleCal will then integrate your class schedule into your Google Calendar. If you've synced your smartphone's calendar with your Google account, it'll show up there as well!
+* You'll first be asked to enter your CalNet credentials -- I'm not storing them, I swear. Check the source code if you're worried!
+* You'll then be provided with two choices for your Google Calendar:
+  * Use existing Google credentials that TeleCal stores securely on your machine (if they exist), or
+  * Provide new Google credentials by logging in with OAuth2 authentication to your Google account in a browser window that'll automatically open up after the next step.
+* You'll then be asked to provide the end date for the semester.
+
+Voilà, TeleCal will then integrate your class schedule into your Google Calendar! If you've synced your smartphone's calendar with your Google account, it'll show up there as well.
+
+**I tried creating an executable using pyinstaller. Didn't work unfortunately!
