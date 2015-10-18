@@ -3,7 +3,7 @@ Integrates Cal students' class schedules (from TeleBears) with their Google Cale
 
 This is a Python tool to integrate Cal students' class schedules (from [TeleBears](https://telebears.berkeley.edu/telebears/home)) with their [Google Calendars](https://www.google.com/calendar/). No need to login to TeleBears to check your schedule ever again, it's all on your Google Calendar! 
 
-Uses the [Google Calendar API](https://developers.google.com/google-apps/calendar/quickstart/python) (you may skip Step 1), [Selenium](http://selenium-python.readthedocs.org/), [PhantomJS](http://phantomjs.org/) and [BeautifulSoup](https://pypi.python.org/pypi/beautifulsoup4). Since there's no TeleBears API, I had to work my way around CalNet authentication using Selenium and PhantomJS ;)
+Uses the [Google Calendar API](https://developers.google.com/google-apps/calendar/quickstart/python), [Selenium](http://selenium-python.readthedocs.org/), [PhantomJS](http://phantomjs.org/) and [BeautifulSoup](https://pypi.python.org/pypi/beautifulsoup4). Since there's no TeleBears API, I had to work my way around CalNet authentication using Selenium and PhantomJS ;)
 
 ##Usage
 * Download the .zip file from the pane on the right >> , and extract its contents (Git folks can feel free to fork + pull instead).
