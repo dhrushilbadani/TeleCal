@@ -138,7 +138,6 @@ def main():
 
     submit = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="loginForm"]/fieldset[1]/p[4]/input[4]')))
     submit.click()
-    print 'clicked!'
     check_element = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mainmenu"]/ul/li[1]/a')))
     content = browser.page_source
 
