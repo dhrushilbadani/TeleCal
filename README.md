@@ -7,7 +7,12 @@ Uses the [Google Calendar API](https://developers.google.com/google-apps/calenda
 
 ##Usage
 * Download the .zip file from the pane on the right >> , and extract its contents (Git folks can feel free to fork + pull instead).
-* Get the necessary libraries** and run TeleCal.py (in the extracted folder):
+* [Install pip](http://pip.readthedocs.org/en/stable/installing/), if you haven't already. It's rather useful.
+* Install dependencies from within the extracted folder:
+    ```
+    pip install -r requirements.txt
+    ```
+*  Run TeleCal.py (in the extracted folder):
     ```
     python TeleCal.py
     ```
