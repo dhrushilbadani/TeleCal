@@ -1,9 +1,14 @@
-import httplib2
-import os
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from apiclient import discovery
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
+import getpass
+import httplib2
+import os
 import datetime
 from bs4 import BeautifulSoup
 import helpers
@@ -11,7 +16,6 @@ import helpers
 SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'TeleCal'
-
 
 def edit(time):
     s = time.replace('AM','').replace('PM','')
@@ -57,12 +61,13 @@ def get_credentials(choice):
         print 'Storing credentials to ' + credential_path
     return credentials
 
-def createEvents(service, stopDate):
+def createEvents(content, service, stopDate):
     '''
-    Gets data from the TeleBears HTML, and adds each class as a recurring event to
-    the logged-in user's Google Calendar using the Google Calendar API.
+    Gets data from the content obtained via Selenium, and adds each class
+    as a recurring event to the logged-in user's Google Calendar using the
+    Google Calendar API.
     '''
-    soup = BeautifulSoup(open(os.path.realpath('TeleBears.html')), "html.parser")
+    soup = BeautifulSoup(content, "html.parser")
     table = soup.find('table', attrs={'class':'class-list-content'})
     table_body = table.find('tbody')
     rows = table_body.find_all('tr', attrs={'class':'tbl-data'})
@@ -71,50 +76,72 @@ def createEvents(service, stopDate):
         cols = [ele.text.strip().replace('u','') for ele in info]
         course = (cols[1] + ' ' + cols[2]).split(' ')
         descr = course[0] + ' ' + course[1] + ' ' + course[3]
-        print 'Adding', descr, 'to your Google Calendar..'
-        days = helpers.getDays(cols[5])
-        time = str(cols[6])
-        ampm = time[-2:]
-        time = time.split('-')
-        begin = time[0]
-        beginAm = 'AM' in begin
-        begin = begin.split(':')
-        beginArr = [int(edit(begin[0])), int(edit(begin[1]))]
-        end = time[1]
-        endPm = 'PM' in end
-        end = end.split(':')
-        endArr = [int(edit(end[0])), int(edit(end[1]))]
-        if endPm is True and endArr[0] != 12 :
-            endArr = [endArr[0] + 12, endArr[1]]
-            if not beginAm and beginArr[0] != 12:
-                beginArr = [beginArr[0] + 12, beginArr[1]]
-        location = cols[7]
-        for d in days:
-            next_day = helpers.next_weekday(d)
-            startTime = next_day.replace(hour = beginArr[0], minute = beginArr[1], second = 0).isoformat()
-            startTime = startTime[0: startTime.rfind(':')+3]
-            endTime = next_day.replace(hour = endArr[0], minute = endArr[1], second = 0).isoformat()
-            endTime = endTime[0: endTime.rfind(':')+3]
-            event = {
-                  'summary': descr,
-                  'location': location,
-                  'start': {
-                    'dateTime': startTime,
-                    'timeZone': 'America/Los_Angeles'
-                  },
-                  'end': {
-                    'dateTime': endTime,
-                    'timeZone': 'America/Los_Angeles'
-                  },
-                  'recurrence': [
-                    'RRULE:FREQ=WEEKLY;UNTIL='+stopDate,
-                  ]
-                }
-            recurring_event = service.events().insert(calendarId='primary', body=event).execute()
+        if (cols[5] != 'UNSCHED'):
+            print 'Adding', descr, 'to your Google Calendar..'
+            days = helpers.getDays(cols[5])
+            time = str(cols[6])
+            ampm = time[-2:]
+            time = time.split('-')
+            begin = time[0]
+            beginAm = 'AM' in begin
+            begin = begin.split(':')
+            beginArr = [int(edit(begin[0]).strip()), int(edit(begin[1]).strip())]
+            end = time[1]
+            endPm = 'PM' in end
+            end = end.split(':')
+            endArr = [int(edit(end[0]).strip()), int(edit(end[1]).strip())]
+            if endPm is True and endArr[0] != 12 :
+                endArr = [endArr[0] + 12, endArr[1]]
+                if not beginAm and beginArr[0] != 12:
+                    beginArr = [beginArr[0] + 12, beginArr[1]]
+            location = cols[7]
+            for d in days:
+                next_day = helpers.next_weekday(d)
+                startTime = next_day.replace(hour = beginArr[0], minute = beginArr[1], second = 0).isoformat()
+                startTime = startTime[0: startTime.rfind(':')+3]
+                endTime = next_day.replace(hour = endArr[0], minute = endArr[1], second = 0).isoformat()
+                endTime = endTime[0: endTime.rfind(':')+3]
+                event = {
+                      'summary': descr,
+                      'location': location,
+                      'start': {
+                        'dateTime': startTime,
+                        'timeZone': 'America/Los_Angeles'
+                      },
+                      'end': {
+                        'dateTime': endTime,
+                        'timeZone': 'America/Los_Angeles'
+                      },
+                      'recurrence': [
+                        'RRULE:FREQ=WEEKLY;UNTIL='+stopDate,
+                      ]
+                    }
+                recurring_event = service.events().insert(calendarId='primary', body=event).execute()
     print 'Done!'
 
 
 def main():
+    uname = raw_input('Please enter your CalNet username:')
+    pswd = getpass.getpass('Please enter your CalNet password:')
+
+    #headless Selenium using PhantomJS
+    browser = webdriver.PhantomJS()
+
+    # open web page using PhantomJS
+    browser.get('https://telebears.berkeley.edu/telebears/current?action=class_list')
+
+    username = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="username"]')))
+    password = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="password"]')))
+
+    username.send_keys(uname)
+    password.send_keys(str(pswd))
+
+    submit = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="loginForm"]/fieldset[1]/p[4]/input[4]')))
+    submit.click()
+    print 'clicked!'
+    check_element = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mainmenu"]/ul/li[1]/a')))
+    content = browser.page_source
+
     credChoice = 'invalid'
     while credChoice == 'invalid':
         choice = raw_input('Do you want to use existing Google credentials stored on your system? [Y/N]')
@@ -137,7 +164,7 @@ def main():
     credentials = get_credentials(credChoice)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
-    createEvents(service, stopDate)
+    createEvents(content, service, stopDate)
 
 if __name__ == '__main__':
     main()
